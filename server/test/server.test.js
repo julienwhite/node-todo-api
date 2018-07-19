@@ -1,7 +1,7 @@
 const expect = require('expect');
 const request = require('supertest');
 
-const {app} = require('./../server');
+const {app} = require('./../server'); // same as: const app = require('./../server').app;
 const {Todo} = require('./../models/todo');
 
 beforeEach((done) => {
