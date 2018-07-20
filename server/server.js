@@ -11,7 +11,7 @@ var app = express();
 app.use(bodyParser.json());
 
 app.post('/todos', (req,res) => {
-  console.log('POST /todos request sent:', req.body.text);
+  console.log('--> POST /todos:', req.body.text);
   var todo = new Todo(
     { text: req.body.text }
   );
@@ -25,7 +25,7 @@ app.post('/todos', (req,res) => {
 });
 
 app.get('/todos', (req,res) => {
-  console.log('GET /todos request sent');
+  console.log('--> GET /todos');
   Todo.find().then((todos) => {
     res.send({todos})
   }, (e) => {
@@ -35,21 +35,22 @@ app.get('/todos', (req,res) => {
 
 app.get('/todos/:id', (req,res) => {
   var {id} = req.params;
-  console.log(`GET /todos/${id} request sent`);
+  console.log(`--> GET /todos/${id}`);
 
   if(!ObjectID.isValid(id))
   {
-    res.status(404).send({"error":"Invalid ID"})
+    res.status(404).send({error:"Invalid ID"})
   }
   Todo.findById(id).then((todo) =>
   {
     if(!todo)
     {
-      res.status(404).send({"error":"Todo not found"})
+      res.status(404).send({error:"Todo not found"})
     }
     res.send({todo})
   }).catch((e) => {
-    res.status(400).send(e);
+    console.log('Error',e.message);
+    res.status(400).send();
   })
 });
 
