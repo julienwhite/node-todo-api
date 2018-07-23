@@ -21,7 +21,7 @@ app.post('/todos', (req,res) => {
       res.send(doc)
     },
   (e) => {
-    res.status(400).send(e);
+    res.status(400).send();
   });
 });
 
@@ -30,7 +30,7 @@ app.get('/todos', (req,res) => {
   Todo.find().then((todos) => {
     res.send({todos})
   }, (e) => {
-    res.status(400).send(e);
+    res.status(400).send();
   })
 });
 
@@ -40,19 +40,18 @@ app.get('/todos/:id', (req,res) => {
 
   if(!ObjectID.isValid(id))
   {
-    res.status(404).send({error:"Invalid ID"})
+    res.status(404).send({error:'Invalid ID'})
   }
   Todo.findById(id).then((todo) =>
   {
     if(!todo)
     {
-      res.status(404).send({error:"Todo not found"})
+      res.status(404).send({error:'Todo not found'})
     }
     res.send({todo})
   }).catch((e) => {
-    console.log('Error',e.message);
     res.status(400).send();
-  })
+  });
 });
 
 app.delete('/todos/:id', (req,res) => {
@@ -62,17 +61,16 @@ app.delete('/todos/:id', (req,res) => {
   // Validate the ID -> not valid? return 404
   if(!ObjectID.isValid(id))
   {
-    res.status(404).send({error:"invalid ID"});
+    res.status(404).send({error:'invalid ID'});
   }
   // remove todo by ID
   Todo.findByIdAndRemove(id).then((todo) => {
     if(!todo) { // Failure
-      res.status(404).send({error:"ID not found"});
+      res.status(404).send({error:'ID not found'});
     }
-    res.status(200).send({deleted:todo}); // Success
+    res.status(200).send({todo}); // Success
   }).catch((e) => {
-    console.log(e.message); // Error
-    res.status(400).send({error: e.message});
+    res.status(400).send();
   })
 });
 
