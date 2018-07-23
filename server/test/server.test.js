@@ -11,7 +11,9 @@ const todos = [{
 },
 {
   _id: new ObjectID,
-  text: 'Second test todo'
+  text: 'Second test todo',
+  completed: true,
+  completedAt: 888
 }];
 
 var count = 0;
@@ -60,13 +62,13 @@ describe('###### POST /todos ######', () => {
   });
 });
 
-describe('###### GET /todos ######', () => {
-  beforeEach((done) => {
-    Todo.remove({}).then(() => {
-      return Todo.insertMany(todos);
-    }).then(() => done());
-  });
+beforeEach((done) => {
+  Todo.remove({}).then(() => {
+    return Todo.insertMany(todos);
+  }).then(() => done());
+});
 
+describe('###### GET /todos ######', () => {
   it('should get all todos', (done) => {
       request(app)
       .get('/todos')
@@ -147,4 +149,43 @@ describe('###### DELETE /todos/:id ######', () => {
       .expect(404)
       .end(done);
   });
+});
+
+describe('###### PATCH /todos/:id ######', () => {
+  it('should update the todo', (done) => {
+    // grab id of first item
+    var body = todos[0];
+    var hexID = body._id.toHexString();
+    body.completed = true;
+    body.text = 'updated text';
+    // update text, set completed true
+    request(app)
+      .patch(`/todos/${hexID}`)
+      .send(body)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.completed).toBe(true);
+        expect(res.body.todo.text).toBe(body.text);
+        expect(res.body.todo.completedAt).toBeA('number');
+      }).end(done);
+  });
+
+  it('should clear competedAt when todo is not completed', (done) => {
+    // grab ud of second todo item
+    var body = todos[1];
+    var hexID = body._id.toHexString();
+    // update textm set completed fakse
+    body.completed = false;
+    body.text = 'updated text 2';
+    request(app)
+      .patch(`/todos/${hexID}`)
+      .send(body)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.completed).toBe(false);
+        expect(res.body.todo.text).toBe(body.text);
+        expect(res.body.todo.completedAt).toNotExist();
+      }).end(done);
+    // test is changed, completed false, completedAt is null .toNotExist
+  })
 });
