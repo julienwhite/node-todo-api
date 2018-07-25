@@ -1,6 +1,10 @@
 /* DOC
     http://mongoosejs.com/docs/validation.html
+    http://mongoosejs.com/docs/queries.html
     http://mongoosejs.com/docs/guide.html
+    http://mongoosejs.com/docs/middleware.html
+    https://jwt.io/
+    https://www.npmjs.com/package/bcryptjs
 */
 
 require('./config/config');
