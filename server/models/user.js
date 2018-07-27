@@ -93,13 +93,3 @@ UserSchema.pre('save', function (next) {
 const User = mongoose.model('User', UserSchema);
 
 module.exports = {User};
-
-// var newUser = new User({
-//   email: 'tim@tim.com'
-// });
-//
-// newUser.save().then((doc) => {
-//   console.log('Saved user', doc);
-// }, (e) => {
-//   console.log('Unable to save: ' + e);
-// });
