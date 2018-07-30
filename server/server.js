@@ -25,7 +25,7 @@ const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 
 app.post('/todos', (req,res) => {
-  console.log('--> POST /todos:', req.body.text);
+  console.log('>>> POST /todos:', req.body.text);
   var todo = new Todo(
     { text: req.body.text }
   );
@@ -39,7 +39,7 @@ app.post('/todos', (req,res) => {
 });
 
 app.get('/todos', (req,res) => {
-  console.log('--> GET /todos');
+  console.log('>>> GET /todos');
   Todo.find().then((todos) => {
     res.send({todos})
   }, (e) => {
@@ -49,7 +49,7 @@ app.get('/todos', (req,res) => {
 
 app.get('/todos/:id', (req,res) => {
   var {id} = req.params;
-  console.log(`--> GET /todos/${id}`);
+  console.log(`>>> GET /todos/${id}`);
 
   if(!ObjectID.isValid(id))
   {
@@ -70,7 +70,7 @@ app.get('/todos/:id', (req,res) => {
 app.delete('/todos/:id', (req,res) => {
   // get the ID
   var {id} = req.params;
-  console.log(`--> DELETE /todos/${id}`);
+  console.log(`>>> DELETE /todos/${id}`);
   // Validate the ID -> not valid? return 404
   if(!ObjectID.isValid(id))
   {
@@ -89,7 +89,7 @@ app.delete('/todos/:id', (req,res) => {
 
 app.patch('/todos/:id', (req,res) => {
   var id = req.params.id;
-  console.log(`--> PATCH /todos/${id}`);
+  console.log(`>>> PATCH /todos/${id}`);
   var body = _.pick(req.body, ['text', 'completed']);
 
   if(!ObjectID.isValid(id)) {
@@ -109,6 +109,7 @@ app.patch('/todos/:id', (req,res) => {
     }
     res.send({todo});
   }).catch((e) => {
+    console.log('!!! Bad request:', e.message);
     res.status(404).send();
   })
 });
@@ -116,31 +117,49 @@ app.patch('/todos/:id', (req,res) => {
 // POST /users
 app.post('/users', (req,res) => {
   var user = new User(_.pick(req.body, ['email', 'password']));
-  console.log('--> POST /users:', user.email);
+  console.log('>>> POST /users:', user.email);
   user.save().then(() => {
       return user.generateAuthToken();
     }).then((token) => {
       res.header('x-auth', token).send(user);
+      console.log('+++ User created');
     }).catch((e) => {
-      res.status(400).send(e)
+      console.log('!!! Bad request:', e.message);
+      res.status(400).send(e);
     });
 });
 
 // POST /users/login {email, password}
 app.post('/users/login', (req, res) => {
   var user = new User(_.pick(req.body, ['email', 'password']));
-  console.log('--> POST /users/login:', user.email);
+  console.log('>>> POST /users/login:', user.email);
   User.findByCredentials(user.email, user.password).then((user) => {
     return user.generateAuthToken().then((token) => {
       res.header('x-auth', token).send(user);
+      console.log('+++ User logged in');
     });
   }).catch((e) => {
+    console.log('!!! Bad request');
+    if(e) console.log(e.message);
     res.status(400).send();
-  })
-})
+  });
+});
+
+// DELETE
+app.delete('/users/me/token', authenticate, (req, res) => {
+  console.log('>>> DELETE /users/me/token:', req.token);
+  req.user.removeToken(req.token).then(() => {
+    console.log('--- Token deleted');
+    res.status(200).send();
+  }, () => {
+    console.log('!!! Bad request');
+    res.status(400).send();
+  });
+});
 
 app.get('/users/me', authenticate, (req,res) => {
   res.send(req.user);
+  console.log('+++ User data retrieved');
 });
 
 app.listen(port, () => {
