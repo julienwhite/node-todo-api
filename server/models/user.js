@@ -12,8 +12,8 @@ var UserSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    minlength: 1,
     trim: true,
+    minlength: 1,
     unique: true,
     validate: {
       validator: validator.isEmail,
