@@ -54,7 +54,8 @@ app.get('/todos', authenticate, (req,res) => {
 
 app.get('/todos/:id', authenticate, (req,res) => {
   var {id} = req.params;
-  console.log(`>>> GET /todos/${id}`);
+  var shortId = id.substr(id.length - 5);
+  console.log(`>>> GET /todos/****${shortId}`);
 
   if(!ObjectID.isValid(id))
   {
@@ -78,7 +79,8 @@ app.get('/todos/:id', authenticate, (req,res) => {
 app.delete('/todos/:id', authenticate, (req,res) => {
   // get the ID
   var {id} = req.params;
-  console.log(`>>> DELETE /todos/${id}`);
+  var shortId = id.substr(id.length - 5);
+  console.log(`>>> DELETE /todos/****${shortId}`);
   // Validate the ID -> not valid? return 404
   if(!ObjectID.isValid(id))
   {
@@ -100,7 +102,8 @@ app.delete('/todos/:id', authenticate, (req,res) => {
 
 app.patch('/todos/:id', authenticate, (req,res) => {
   var id = req.params.id;
-  console.log(`>>> PATCH /todos/${id}`);
+  var shortId = id.substr(id.length - 5);
+  console.log(`>>> PATCH /todos/****${shortId}`);
   var body = _.pick(req.body, ['text', 'completed']);
 
   if(!ObjectID.isValid(id)) {
@@ -160,7 +163,8 @@ app.post('/users/login', (req, res) => {
 
 // DELETE
 app.delete('/users/me/token', authenticate, (req, res) => {
-  console.log('>>> DELETE /users/me/token:', req.token);
+  var shortToken = req.token.substr(req.token.length - 5);
+  console.log('>>> DELETE /users/me/token: *****' + shortToken);
   req.user.removeToken(req.token).then(() => {
     console.log('--- Token deleted');
     res.status(200).send();
